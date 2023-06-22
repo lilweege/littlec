@@ -231,11 +231,10 @@ void eval_exp3(int *value)
 }
 
 /* Is a unary + or -. */
-void eval_expr4(int *value)
+void eval_exp4(int *value)
 {
   register char  op;
 
-  char* token;
   op = '\0';
   if(*token == '+' || *token == '-') {
     op = *token;
@@ -251,7 +250,7 @@ void eval_exp5(int *value)
 {
   if((*token == '(')) {
     get_token();
-    eval_exp0(value);
+    eval_exp0(value);   /* get subexpression */
     if(*token != ')') sntx_err(PAREN_EXPECTED);
     get_token();
   }
@@ -259,7 +258,7 @@ void eval_exp5(int *value)
     atom(value);
 }
 
-/* Find value of number, variable, or function */
+/* Find value of number, variable, or function. */
 void atom(int *value)
 {
   int i;
@@ -294,7 +293,7 @@ void atom(int *value)
     if(*token==')') return; /* process empty expression */
     else sntx_err(SYNTAX); /* syntax error */
   default:
-    sntx_err(SYNTAX);
+    sntx_err(SYNTAX); /* syntax error */
   }
 }
 
@@ -308,6 +307,7 @@ void sntx_err(int error)
   static char *e[]= {
     "syntax error",
     "unbalanced parentheses",
+    "no expression present",
     "equals sign expected",
     "not a variable",
     "parameter error",
@@ -317,7 +317,7 @@ void sntx_err(int error)
     "type specifier expected",
     "too many nested function calls",
     "return without call",
-    "paraentheses expected",
+    "parentheses expected",
     "while expected",
     "closing quote expected",
     "not a string",
@@ -367,7 +367,7 @@ int get_token(void)
     return (token_type = DELIMITER);
   }
 
-  if(strchr("{}", *prog)) { /* block delimeters */
+  if(strchr("{}", *prog)) { /* block delimiters */
     *temp = *prog;
     temp++;
     *temp = '\0';
@@ -419,8 +419,8 @@ int get_token(void)
           *temp = GE; temp++; *temp = GE;
        }
        else {
-          prog++;
-          *temp = GT;
+         prog++;
+         *temp = GT;
        }
        temp++;
        *temp = '\0';
@@ -429,7 +429,7 @@ int get_token(void)
     if(*token) return(token_type = DELIMITER);
   }
 
-  if(strchr("+-*^/%=;(),'", *prog)){ /* delimeter */
+  if(strchr("+-*^/%=;(),'", *prog)){ /* delimiter */
     *temp = *prog;
     prog++; /* adbance to next position */
     temp++;
@@ -508,7 +508,7 @@ int internal_func(char *s)
   return -1;
 }
 
-/* Return true if c is a delimeter. */
+/* Return true if c is a delimiter. */
 int isdelim(char c)
 {
   if(strchr(" !;,+-<>'/*%^=()", c) || c == 9 ||
