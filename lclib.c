@@ -72,22 +72,22 @@ int call_puts(void)
   return 0;
 }
 
-/* A built-in console output function */
-int pritn(void)
+/* A built-in console output function. */
+int print(void)
 {
   int i;
 
   get_token();
-  if(*token!='(') sntx_err(PAREN_EXPECTED);
+  if(*token!='(')  sntx_err(PAREN_EXPECTED);
 
   get_token();
   if(token_type==STRING) { /* output a string */
     printf("%s ", token);
   }
   else {  /* output a number */
-    putback();
-    eval_exp(&i);
-    printf("%d ", i);
+   putback();
+   eval_exp(&i);
+   printf("%d ", i);
   }
 
   get_token();
