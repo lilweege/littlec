@@ -184,7 +184,7 @@ void interp_block(void)
           break;
         case RETURN:  /* return from function call */
           func_ret();
-          break;
+          return;
         case IF:      /* process an if statement */
           exec_if();
           break;
@@ -227,7 +227,7 @@ int load_program(char *p, char *fname)
 }
 
 /* Find the location of all functions in the program
-   and store global variables */
+   and store global variables. */
 void prescan(void)
 {
   char *p, *tp;
@@ -235,7 +235,7 @@ void prescan(void)
   int datatype;
   int brace = 0;  /* When 0, this var tells us that
                      current source position is outside
-                     of any function */
+                     of any function. */
 
   p = prog;
   func_index = 0;
@@ -250,7 +250,7 @@ void prescan(void)
     get_token();
     /* global var type or function return type */
     if(tok==CHAR || tok==INT) {
-      datatype = tok; /* dave data type */
+      datatype = tok; /* save data type */
       get_token();
       if(token_type == IDENTIFIER) {
         strcpy(temp, token);
@@ -345,14 +345,14 @@ void call(void)
     func_push(lvartemp);  /* save local var stack index */
     prog = loc;  /* reset prog to start of function */
     get_params(); /* load the function's parameters with
-                     the value of the arguments */
+                     the values of the arguments */
     interp_block(); /* interpret the function */
     prog = temp; /* reset the program pointer */
     lvartos = func_pop(); /* reset the local var stack */
   }
 }
 
-/* Push the arguments to a functino onto the local
+/* Push the arguments to a function onto the local
    variable stack. */
 void get_args(void)
 {
@@ -371,7 +371,7 @@ void get_args(void)
     count++;
   }while(*token == ',');
   count--;
-  /* now, push on local_var_stack in reverse_order */
+  /* now, push on local_var_stack in reverse order */
   for(; count>=0; count--) {
     i.value = temp[count];
     i.v_type = ARG;
@@ -525,7 +525,7 @@ void exec_if(void)
 
     if(tok != ELSE) {
       putback();  /* restore token if
-                     no else is present */
+                     no ELSE is present */
       return;
     }
     interp_block();
@@ -542,15 +542,15 @@ void exec_while(void)
   temp = prog;  /* save location of top of while loop */
   get_token();
   eval_exp(&cond);  /* check the conditional expression */
-  if(cond) interp_block();   /* if true, interpret */
+  if(cond) interp_block();  /* if true, interpret */
   else {  /* otherwise, skip around loop */
     find_eob();
     return;
   }
-  prog = temp;  /* look back to top */
+  prog = temp;  /* loop back to top */
 }
 
-/* Execude a doo loop. */
+/* Execute a do loop. */
 void exec_do(void)
 {
   int cond;
@@ -563,7 +563,7 @@ void exec_do(void)
   interp_block(); /* interpret loop */
   get_token();
   if(tok != WHILE) sntx_err(WHILE_EXPECTED);
-  eval_exp(&cond);  /* check the loop condition */
+  eval_exp(&cond); /* check the loop condition */
   if(cond) prog = temp; /* if true loop; otherwise,
                            continue on */
 }
@@ -610,7 +610,7 @@ void exec_for(void)
     }
 
     if(cond) interp_block();  /* if true, interpret */
-    else {  /* otherwise, skip around the loop */
+    else {  /* otherwise, skip around loop */
       find_eob();
       return;
     }
